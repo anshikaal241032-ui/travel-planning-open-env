@@ -1,0 +1,41 @@
+name: travel-agent-env
+version: "0.1.0"
+description: >
+  TravelAgentEnv simulates a real-world AI travel agent that must plan complete
+  trips for users by searching flights, booking hotels, adding activities, and
+  communicating with users — all within budget constraints.
+author: travel-agent-team
+license: MIT
+tags:
+  - travel
+  - planning
+  - budget
+  - multi-step
+  - real-world
+
+tasks:
+  - id: budget_flight_search
+    name: Budget Flight Search
+    difficulty: easy
+    description: >
+      Solo traveler: Mumbai → Paris, 7 days, $2,000 budget.
+      Find cheapest flight, book 3★+ hotel, add 2+ activities, finalize within budget.
+
+  - id: multi_preference_tokyo
+    name: Multi-Preference Tokyo
+    difficulty: medium
+    description: >
+      Family of 4: Delhi → Tokyo, 5 days, $3,500 budget.
+      Direct/cheapest flight, breakfast hotel, 3+ activities (1 entertainment), within budget.
+
+  - id: complex_london_vip
+    name: Complex London VIP
+    difficulty: hard
+    description: >
+      VIP corporate: Bangalore → London, 3 days, $3,000 budget.
+      Only 5★ hotels with spa, non-stop preferred, 3+ mixed activities, day-by-day schedule.
+
+server:
+  host: "0.0.0.0"
+  port: 7860
+  entry_point: "server.app:app"
