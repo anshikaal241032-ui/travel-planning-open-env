@@ -1,3 +1,17 @@
+---
+title: Travel Agent Env
+emoji: ✈️
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
+# ✈️ TravelAgentEnv
+...rest of your README...
+
+
 # ✈️ TravelAgentEnv
 
 > A real-world OpenEnv environment for training and evaluating AI travel planning agents.
