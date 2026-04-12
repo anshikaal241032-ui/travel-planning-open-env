@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TravelAgent AI — Smart Trip Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="bg-canvas">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+    <div class="noise-overlay"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">✈</span>
+        <span class="logo-text">TravelAgent<span class="logo-accent">AI</span></span>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-tab="planner">Trip Planner</button>
+        <button class="nav-btn" data-tab="dashboard">Dashboard</button>
+        <button class="nav-btn" data-tab="history">History</button>
+        <button class="nav-btn" data-tab="compare">Compare</button>
+      </nav>
+      <div class="header-actions">
+        <button class="btn-icon" id="themeToggle" title="Toggle Theme">🌙</button>
+        <div class="api-status" id="apiStatus">
+          <span class="status-dot"></span>
+          <span class="status-text">Connecting...</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main App -->
+  <main class="app-main">
+
+    <!-- ===== TAB: PLANNER ===== -->
+    <section class="tab-content active" id="tab-planner">
+
+      <!-- Task Selector Banner -->
+      <div class="task-banner">
+        <div class="task-banner-inner">
+          <h1 class="page-title">Plan Your <span class="gradient-text">Dream Trip</span></h1>
+          <p class="page-subtitle">AI-powered travel planning with real-time budget tracking</p>
+          <div class="task-cards">
+            <div class="task-card active" data-task="budget_flight_search">
+              <div class="task-card-icon">🗼</div>
+              <div class="task-card-info">
+                <div class="task-card-title">Mumbai → Paris</div>
+                <div class="task-card-meta">Solo · 7 days · $2,000</div>
+              </div>
+              <div class="task-card-badge easy">Easy</div>
+            </div>
+            <div class="task-card" data-task="multi_preference_tokyo">
+              <div class="task-card-icon">🗾</div>
+              <div class="task-card-info">
+                <div class="task-card-title">Delhi → Tokyo</div>
+                <div class="task-card-meta">Family 4 · 5 days · $3,500</div>
+              </div>
+              <div class="task-card-badge medium">Medium</div>
+            </div>
+            <div class="task-card" data-task="complex_london_vip">
+              <div class="task-card-icon">🎩</div>
+              <div class="task-card-info">
+                <div class="task-card-title">Bangalore → London</div>
+                <div class="task-card-meta">VIP · 3 days · $3,000</div>
+              </div>
+              <div class="task-card-badge hard">Hard</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Planning Grid -->
+      <div class="planning-grid">
+
+        <!-- LEFT: Mission Control -->
+        <aside class="sidebar">
+
+          <!-- Budget Tracker (Feature 1) -->
+          <div class="widget budget-widget">
+            <div class="widget-header">
+              <h3 class="widget-title">💰 Budget Tracker</h3>
+              <button class="widget-action" id="editBudget">Edit</button>
+            </div>
+            <div class="budget-ring-container">
+              <svg class="budget-ring" viewBox="0 0 120 120">
+                <circle class="ring-bg" cx="60" cy="60" r="50" />
+                <circle class="ring-fill" id="budgetRing" cx="60" cy="60" r="50"
+                  stroke-dasharray="314" stroke-dashoffset="314" />
+              </svg>
+              <div class="budget-ring-text">
+                <div class="budget-spent" id="budgetSpent">$0</div>
+                <div class="budget-label">spent</div>
+              </div>
+            </div>
+            <div class="budget-breakdown">
+              <div class="budget-row">
+                <span class="budget-row-label">✈️ Flight</span>
+                <span class="budget-row-val" id="flightCost">—</span>
+              </div>
+              <div class="budget-row">
+                <span class="budget-row-label">🏨 Hotel</span>
+                <span class="budget-row-val" id="hotelCost">—</span>
+              </div>
+              <div class="budget-row">
+                <span class="budget-row-label">🎭 Activities</span>
+                <span class="budget-row-val" id="activitiesCost">—</span>
+              </div>
+              <div class="budget-row total-row">
+                <span class="budget-row-label">Remaining</span>
+                <span class="budget-row-val green" id="budgetRemaining">$0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress Tracker (Feature 2) -->
+          <div class="widget progress-widget">
+            <div class="widget-header">
+              <h3 class="widget-title">📋 Trip Checklist</h3>
+              <span class="progress-pct" id="progressPct">0%</span>
+            </div>
+            <div class="checklist">
+              <div class="check-item" id="check-flight">
+                <div class="check-icon">○</div>
+                <div class="check-label">Flight Selected</div>
+              </div>
+              <div class="check-item" id="check-hotel">
+                <div class="check-icon">○</div>
+                <div class="check-label">Hotel Booked</div>
+              </div>
+              <div class="check-item" id="check-activities">
+                <div class="check-icon">○</div>
+                <div class="check-label">Activities Added (0/<span id="minActs">2</span>)</div>
+              </div>
+              <div class="check-item" id="check-message">
+                <div class="check-icon">○</div>
+                <div class="check-label">User Notified</div>
+              </div>
+              <div class="check-item" id="check-finalized">
+                <div class="check-icon">○</div>
+                <div class="check-label">Itinerary Finalized</div>
+              </div>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+          </div>
+
+          <!-- Live Score (Feature 3) -->
+          <div class="widget score-widget">
+            <div class="widget-header">
+              <h3 class="widget-title">🏆 Live Score</h3>
+              <span class="score-step" id="scoreStep">Step 0</span>
+            </div>
+            <div class="score-display">
+              <div class="score-number" id="scoreNumber">0.00</div>
+              <div class="score-bar-wrap">
+                <div class="score-bar" id="scoreBar"></div>
+              </div>
+              <div class="score-grade" id="scoreGrade">—</div>
+            </div>
+            <div class="reward-log" id="rewardLog">
+              <div class="reward-log-empty">Actions will appear here...</div>
+            </div>
+          </div>
+
+        </aside>
+
+        <!-- CENTER: Main Action Area -->
+        <div class="main-panel">
+
+          <!-- Goal Card -->
+          <div class="goal-card" id="goalCard">
+            <div class="goal-card-icon">🎯</div>
+            <div class="goal-card-text" id="goalText">Select a task to begin planning your trip.</div>
+            <button class="btn-primary btn-lg" id="startBtn">
+              <span>Start Planning</span>
+              <span class="btn-arrow">→</span>
+            </button>
+          </div>
+
+          <!-- Flights Section (Feature 4 - Smart Comparison) -->
+          <div class="section" id="flightsSection" style="display:none">
+            <div class="section-header">
+              <h2 class="section-title">✈️ Available Flights</h2>
+              <div class="sort-controls">
+                <button class="sort-btn active" data-sort="price">Price</button>
+                <button class="sort-btn" data-sort="duration_h">Duration</button>
+                <button class="sort-btn" data-sort="stops">Stops</button>
+              </div>
+            </div>
+            <div class="flights-grid" id="flightsGrid"></div>
+          </div>
+
+          <!-- Hotels Section -->
+          <div class="section" id="hotelsSection" style="display:none">
+            <div class="section-header">
+              <h2 class="section-title">🏨 Available Hotels</h2>
+              <div class="filter-pills" id="hotelFilters">
+                <button class="pill active" data-filter="all">All</button>
+                <button class="pill" data-filter="3">3★</button>
+                <button class="pill" data-filter="4">4★</button>
+                <button class="pill" data-filter="5">5★</button>
+              </div>
+            </div>
+            <div class="hotels-grid" id="hotelsGrid"></div>
+          </div>
+
+          <!-- Activities Section -->
+          <div class="section" id="activitiesSection" style="display:none">
+            <div class="section-header">
+              <h2 class="section-title">🎭 Activities</h2>
+              <div class="filter-pills" id="activityFilters">
+                <button class="pill active" data-filter="all">All</button>
+                <button class="pill" data-filter="culture">Culture</button>
+                <button class="pill" data-filter="entertainment">Entertainment</button>
+                <button class="pill" data-filter="nature">Nature</button>
+              </div>
+            </div>
+            <div class="activities-grid" id="activitiesGrid"></div>
+          </div>
+
+          <!-- Action Bar (Feature 5 - Smart Actions) -->
+          <div class="action-bar" id="actionBar" style="display:none">
+            <div class="action-bar-inner">
+
+              <!-- Message Composer -->
+              <div class="action-block">
+                <label class="action-label">💬 Message to User</label>
+                <div class="message-input-wrap">
+                  <textarea class="message-input" id="userMessage" rows="2"
+                    placeholder="Type your message to the traveler..."></textarea>
+                  <div class="message-actions">
+                    <button class="msg-template-btn" data-msg="Your trip is confirmed! We've selected the best options within your budget.">✓ Confirm</button>
+                    <button class="msg-template-btn" data-msg="We found great deals matching your requirements. Please review your itinerary.">📋 Review</button>
+                    <button class="msg-template-btn" data-msg="All requirements have been met. Your VIP experience awaits!">⭐ VIP</button>
+                  </div>
+                  <button class="btn-secondary" id="sendMessageBtn">Send Message</button>
+                </div>
+              </div>
+
+              <!-- Finalize -->
+              <div class="action-block">
+                <label class="action-label">📄 Finalize Itinerary</label>
+                <textarea class="message-input" id="itinerarySummary" rows="3"
+                  placeholder="Write a detailed day-by-day summary..."></textarea>
+                <div class="finalize-actions">
+                  <button class="btn-ghost" id="autoSummaryBtn">✨ Auto-Generate Summary</button>
+                  <button class="btn-success" id="finalizeBtn">🚀 Finalize Trip</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Result Card (shown after finalize) -->
+          <div class="result-card" id="resultCard" style="display:none">
+            <div class="result-confetti" id="confetti"></div>
+            <div class="result-icon">🎉</div>
+            <h2 class="result-title">Trip Finalized!</h2>
+            <div class="result-score-wrap">
+              <div class="result-score-label">Final Score</div>
+              <div class="result-score" id="finalScore">—</div>
+              <div class="result-grade" id="finalGrade">—</div>
+            </div>
+            <div class="result-summary" id="resultSummary"></div>
+            <button class="btn-primary" id="planAnotherBtn">Plan Another Trip</button>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: Live Activity Feed (Feature 6) -->
+        <aside class="activity-feed-panel">
+          <div class="widget feed-widget">
+            <div class="widget-header">
+              <h3 class="widget-title">⚡ Live Feed</h3>
+              <button class="widget-action" id="clearFeed">Clear</button>
+            </div>
+            <div class="feed-list" id="feedList">
+              <div class="feed-empty">
+                <div class="feed-empty-icon">🗺</div>
+                <div>Start planning to see live updates</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Itinerary Preview (Feature 7) -->
+          <div class="widget itinerary-widget" id="itineraryPreview">
+            <div class="widget-header">
+              <h3 class="widget-title">📅 Itinerary Preview</h3>
+            </div>
+            <div class="itinerary-days" id="itineraryDays">
+              <div class="itinerary-empty">Selections will appear here...</div>
+            </div>
+          </div>
+
+          <!-- Weather Widget (Feature 8) -->
+          <div class="widget weather-widget" id="weatherWidget">
+            <div class="widget-header">
+              <h3 class="widget-title">🌤 Destination Info</h3>
+            </div>
+            <div class="dest-info" id="destInfo">
+              <div class="dest-placeholder">Select a destination...</div>
+            </div>
+          </div>
+
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- ===== TAB: DASHBOARD ===== -->
+    <section class="tab-content" id="tab-dashboard">
+      <div class="dashboard-grid">
+        <div class="dash-header">
+          <h1 class="page-title">Planning <span class="gradient-text">Dashboard</span></h1>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon">✈️</div>
+            <div class="stat-val" id="stat-trips">0</div>
+            <div class="stat-label">Trips Planned</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-val" id="stat-avgscore">—</div>
+            <div class="stat-label">Avg Score</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-val" id="stat-saved">$0</div>
+            <div class="stat-label">Budget Saved</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-val" id="stat-best">—</div>
+            <div class="stat-label">Best Score</div>
+          </div>
+        </div>
+        <div class="chart-area">
+          <div class="chart-card">
+            <h3 class="chart-title">Score History</h3>
+            <div class="chart-container">
+              <canvas id="scoreChart" width="500" height="200"></canvas>
+              <div class="chart-empty" id="scoreChartEmpty">No trips planned yet.</div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title">Budget Utilization</h3>
+            <div class="chart-container">
+              <canvas id="budgetChart" width="300" height="200"></canvas>
+              <div class="chart-empty" id="budgetChartEmpty">No data yet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB: HISTORY ===== -->
+    <section class="tab-content" id="tab-history">
+      <div class="history-wrap">
+        <div class="dash-header">
+          <h1 class="page-title">Trip <span class="gradient-text">History</span></h1>
+          <button class="btn-ghost" id="clearHistory">Clear All</button>
+        </div>
+        <div class="history-list" id="historyList">
+          <div class="history-empty">
+            <div class="history-empty-icon">🗺</div>
+            <p>No completed trips yet. Start planning!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB: COMPARE ===== -->
+    <section class="tab-content" id="tab-compare">
+      <div class="compare-wrap">
+        <div class="dash-header">
+          <h1 class="page-title">Compare <span class="gradient-text">Options</span></h1>
+        </div>
+        <div class="compare-panel">
+          <div class="compare-instructions">
+            <div class="compare-icon">⚖️</div>
+            <h3>Side-by-Side Comparison</h3>
+            <p>Select multiple flights, hotels or activities and compare them here.</p>
+          </div>
+          <div class="compare-grid" id="compareGrid"></div>
+        </div>
+        <div class="compare-table-wrap" id="compareTableWrap" style="display:none">
+          <table class="compare-table" id="compareTable"></table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Notification (Feature) -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay" style="display:none">
+    <div class="loader">
+      <div class="loader-plane">✈️</div>
+      <div class="loader-text" id="loaderText">Processing...</div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
